@@ -1,4 +1,7 @@
 import "dotenv/config";
+import dns from "dns";
+dns.setDefaultResultOrder("ipv4first");
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
 import express from "express";
 import cors from "cors"
 import cookieParser from "cookie-parser"
@@ -7,24 +10,35 @@ import authRouter from "./routes/auth.routes.js";
 import billingRouter from "./routes/billing.routes.js";
 import userRouter from "./routes/user.routes.js";
 import websiteRouter from "./routes/websites.routes.js";
-import { razorpayWebhook } from "./controllers/razorpayWebhook.js";
+
 const app = express();
 
-app.post("/api/razorpay/webhook",express.raw({type:"application/json"}),razorpayWebhook)
+
 const PORT = process.env.PORT || 5000;
 
 app.use(express.json())
 app.use(cookieParser())
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    "http://localhost:5173",
+    "http://localhost:5174",
+].filter(Boolean)
+
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true)
+        } else {
+            callback(new Error("Not allowed by CORS"))
+        }
+    },
     credentials: true
 }))
 app.use("/api/auth", authRouter)
 app.use("/api/user", userRouter)
 app.use("/api/website", websiteRouter)
 app.use("/api/billing", billingRouter)
-connectDb().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server started on port ${PORT}`)
-    })
-})
+connectDb()
+app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`)
+})
