@@ -16,6 +16,7 @@ const app = express();
 
 const PORT = process.env.PORT || 5000;
 
+app.use("/api/billing/webhook", express.raw({ type: "application/json" }))
 app.use(express.json())
 app.use(cookieParser())
 const allowedOrigins = [
