@@ -16,7 +16,7 @@ const app = express();
 
 const PORT = process.env.PORT || 5000;
 
-app.use("/api/billing/webhook", express.raw({ type: "application/json" }))
+app.use("/api/billing/webhook", express.raw({ type: "application/json" }));
 app.use(express.json())
 app.use(cookieParser())
 const allowedOrigins = [
@@ -42,4 +42,4 @@ app.use("/api/billing", billingRouter)
 connectDb()
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`)
-})
+})

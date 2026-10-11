@@ -18,6 +18,7 @@ export const billing = async (req, res) => {
     const options = {
       amount: amount,
       currency: "INR",
+      payment_capture: 1,
       receipt: `receipt_order_${Date.now()}`,
       notes: {
         userId: userId.toString(),
