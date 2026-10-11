@@ -40,7 +40,7 @@ function WebsiteEditor() {
         setMessages((m) => [...m, { role: "user", content: prompt }])
         try {
             const result = await axios.post(`${serverUrl}/api/website/update/${id}`, { prompt: text }, { withCredentials: true })
-            console.log(result)
+            console.log(result) 
             setUpdateLoading(false)
             setMessages((m) => [...m, { role: "ai", content: result.data.message }])
             setCode(result.data.code)

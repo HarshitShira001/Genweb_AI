@@ -52,8 +52,6 @@ const plans = [
         button: "Contact Sales",
     },
 ];
-
-/** Dynamically load the Razorpay checkout script */
 const loadRazorpayScript = () =>
     new Promise((resolve) => {
         if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
@@ -91,16 +89,12 @@ function Pricing() {
             )
 
             const { order } = result.data
-
-            // Step 2: load Razorpay JS SDK
             const loaded = await loadRazorpayScript()
             if (!loaded) {
                 alert("Failed to load payment gateway. Please try again.")
                 setLoading(null)
                 return
             }
-
-            // Step 3: open Razorpay checkout modal
             const options = {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                 amount: order.amount,
@@ -108,9 +102,25 @@ function Pricing() {
                 name: "GenWeb.ai",
                 description: `${planKey.charAt(0).toUpperCase() + planKey.slice(1)} Plan`,
                 order_id: order.id,
-                handler: () => {
-                    // Payment success — redirect to dashboard
-                    navigate("/dashboard")
+                handler: async (response) => {
+                    try {
+                        await axios.post(
+                            `${serverUrl}/api/billing/verify`,
+                            {
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                planType: planKey,
+                            },
+                            { withCredentials: true }
+                        );
+                        alert("Payment successful! Credits updated.");
+                        navigate("/dashboard");
+                    } catch (err) {
+                        console.error("Verification failed:", err);
+                        alert("Payment was received but verification failed. Please contact support.");
+                        navigate("/dashboard");
+                    }
                 },
                 prefill: {
                     name: userData.name,

@@ -8,7 +8,6 @@ import axios from 'axios'
 import { setUserData } from '../redux/userSlice'
 import { useNavigate } from 'react-router-dom'
 function Home() {
-
     const highlights = [
         "AI Generated Code",
         "Fully Responsive Layouts",
