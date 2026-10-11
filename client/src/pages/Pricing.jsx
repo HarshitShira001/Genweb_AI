@@ -102,25 +102,8 @@ function Pricing() {
                 name: "GenWeb.ai",
                 description: `${planKey.charAt(0).toUpperCase() + planKey.slice(1)} Plan`,
                 order_id: order.id,
-                handler: async (response) => {
-                    try {
-                        await axios.post(
-                            `${serverUrl}/api/billing/verify`,
-                            {
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature,
-                                planType: planKey,
-                            },
-                            { withCredentials: true }
-                        );
-                        alert("Payment successful! Credits updated.");
-                        navigate("/dashboard");
-                    } catch (err) {
-                        console.error("Verification failed:", err);
-                        alert("Payment was received but verification failed. Please contact support.");
-                        navigate("/dashboard");
-                    }
+                handler: () => {
+                    navigate("/dashboard")
                 },
                 prefill: {
                     name: userData.name,
